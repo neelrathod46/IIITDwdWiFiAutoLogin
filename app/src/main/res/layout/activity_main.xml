@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:gravity="center"
+    tools:ignore="VisualLintBounds,TextContrastCheck"> 
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/unamebtnHint"
+        android:inputType="textNoSuggestions"
+        android:autofillHints="username"
+        android:minHeight="48dp" /> 
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/passbtnHint"
+        android:inputType="textPassword"
+        android:layout_marginTop="16dp"
+        android:autofillHints="password"
+        android:minHeight="48dp" /> 
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/savebtnText"
+        android:layout_marginTop="32dp" />
+</LinearLayout>
