@@ -35,6 +35,8 @@ class MainActivity : ComponentActivity() {
         if (savedUser.isNotEmpty()) etUsername.setText(KeystoreHelper.decrypt(savedUser))
         if (savedPass.isNotEmpty()) etPassword.setText(KeystoreHelper.decrypt(savedPass))
 
+        val btnLogin = findViewById<Button>(R.id.btnLogin)
+
         btnSave.setOnClickListener {
             val user = etUsername.text.toString().trim()
             val pass = etPassword.text.toString().trim()
@@ -48,6 +50,32 @@ class MainActivity : ComponentActivity() {
             } else {
                 Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        btnLogin.setOnClickListener {
+            val user = etUsername.text.toString().trim()
+            val pass = etPassword.text.toString().trim()
+
+            if (user.isNotEmpty() && pass.isNotEmpty()) {
+                sharedPreferences.edit {
+                    putString("username", KeystoreHelper.encrypt(user))
+                    putString("password", KeystoreHelper.encrypt(pass))
+                }
+            }
+
+            btnLogin.isEnabled = false
+            Toast.makeText(this, "Attempting login...", Toast.LENGTH_SHORT).show()
+
+            Thread {
+                val result = LoginHelper.performLogin(this)
+                runOnUiThread {
+                    btnLogin.isEnabled = true
+                    when (result) {
+                        is LoginResult.Success -> Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
+                        is LoginResult.Failure -> Toast.makeText(this, result.error, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }.start()
         }
     }
 
