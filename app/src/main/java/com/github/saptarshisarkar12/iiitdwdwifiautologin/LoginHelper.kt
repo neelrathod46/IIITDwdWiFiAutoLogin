@@ -1,6 +1,8 @@
 package com.github.saptarshisarkar12.iiitdwdwifiautologin
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
@@ -31,7 +33,21 @@ object LoginHelper {
 
         return try {
             val url = URL("http://172.16.16.16:8090/login.xml")
-            val conn = url.openConnection() as HttpURLConnection
+
+            // Prefer routing directly through the Wi-Fi network interface
+            // to prevent Mobile Data from intercepting local campus requests
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val wifiNetwork = connectivityManager.allNetworks.firstOrNull { network ->
+                val capabilities = connectivityManager.getNetworkCapabilities(network)
+                capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            }
+
+            val conn = if (wifiNetwork != null) {
+                wifiNetwork.openConnection(url) as HttpURLConnection
+            } else {
+                url.openConnection() as HttpURLConnection
+            }
+
             conn.requestMethod = "POST"
             conn.connectTimeout = 6000
             conn.readTimeout = 6000
@@ -58,7 +74,7 @@ object LoginHelper {
 
             val portalMessage = if (responseText.isNotEmpty()) {
                 val match = Regex("<message>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?</message>", RegexOption.DOT_MATCHES_ALL).find(responseText)
-                match?.groupValues?.get(1)?.trim()
+                match?.groupValues?.get(1)?.trim()?.replace("{username}", username, ignoreCase = true)
             } else null
 
             if (responseCode in 200..299) {
