@@ -78,6 +78,12 @@ object LoginHelper {
             } else null
 
             if (responseCode in 200..299) {
+                // Inform Android OS that network connectivity is now working,
+                // prompting it to re-test the connection and dismiss the "Sign in to network" prompt.
+                if (wifiNetwork != null) {
+                    connectivityManager.reportNetworkConnectivity(wifiNetwork, true)
+                }
+
                 val displayMsg = portalMessage?.takeIf { it.isNotBlank() } ?: "Login request sent (HTTP $responseCode)"
                 LoginResult.Success(displayMsg)
             } else {
